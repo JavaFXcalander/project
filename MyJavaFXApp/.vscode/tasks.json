@@ -10,7 +10,7 @@
           "C:/Users/pansy/JavaFx/javafx-sdk-24.0.1/lib",
           "--add-modules",
           "javafx.controls",
-          "Main.java"
+          "src/main/main.java"
         ],
         "group": {
           "kind": "build",
@@ -20,4 +20,3 @@
       }
     ]
   }
-  

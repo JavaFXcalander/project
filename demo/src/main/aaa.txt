@@ -1,0 +1,5 @@
+javac -d out -cp ".;JavaFx\javafx-sdk-24.0.1\lib\*" src\main\*.java
+
+cp -r src/main/resources/* out/main/resources/ 
+
+java --module-path JavaFx\javafx-sdk-24.0.1\lib --add-modules javafx.controls,javafx.fxml -cp out main.Main
