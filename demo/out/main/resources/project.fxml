@@ -11,7 +11,7 @@
             <Insets top="20" right="20" bottom="20" left="20"/>
         </padding>
 
-        <Label text="2025 April Project" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <Label fx:id="monthYearLabel" text="2025 April Project" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
 
         <!-- Projects -->
         <GridPane hgap="0" vgap="0" GridPane.vgrow="ALWAYS">
@@ -386,4 +386,6 @@
 
         </VBox>
     </VBox>
+    <Button text="Month" onAction="#handleBackToCalendar"  styleClass="Month-button" />
+    
 </AnchorPane>

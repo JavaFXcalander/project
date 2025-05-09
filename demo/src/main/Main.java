@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("main/resources/project.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("main/resources/Calendar.fxml"));
         loader.setController(null); // 加這行！
         Parent root = loader.load();
         Scene scene = new Scene(root, 900, 600);

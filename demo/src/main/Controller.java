@@ -1,11 +1,25 @@
 package main;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.Node; // 導入 Node 類
+import javafx.scene.Scene; // 確保導入 Scene 類
+
 
 public class Controller {
 
@@ -26,6 +40,12 @@ public class Controller {
     private ProgressBar progressBar3;
     @FXML
     private ProgressBar progressBar4;
+
+    @FXML
+    private Label monthYearLabel;  // 用來顯示月份的 Label
+
+    private int currentMonth;
+    private int currentYear;
 
     @FXML
     public void initialize() {
@@ -124,4 +144,46 @@ public class Controller {
             }
         }
     }
+
+
+    //新加的
+
+    public void setMonth(int month, int year) {
+        this.currentMonth = month;
+        this.currentYear = year;
+        // 使用月份和年份設置標籤的文本
+        String monthName = LocalDate.of(year, month, 1).getMonth().getDisplayName(TextStyle.FULL, Locale.US);
+        monthYearLabel.setText(year +" " + monthName + " " + "project");
+    }
+
+    @FXML
+    private void handleBackToCalendar(ActionEvent event) throws IOException {
+        // 加載 Calendar 頁面
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/calendar.fxml"));
+        Parent calendarRoot = loader.load();
+
+        // 獲取當前場景，並將 Calendar 頁面設置為 BorderPane 的 center
+        Scene scene = ((Node) event.getSource()).getScene();
+        scene.setRoot(calendarRoot);
+    }
+
+    @FXML
+    private void handleMonthButton(ActionEvent event) throws IOException {
+        // 創建 FXMLLoader 並設置共享的 CalendarController 實例
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/main/resources/calendar.fxml"));
+        CalendarController sharedCalendarController = new CalendarController();
+        loader.setController(sharedCalendarController);
+
+        // 加載 Calendar 頁面
+        Parent monthRoot = loader.load();
+
+        // 傳遞當前月份和年份
+        sharedCalendarController.setMonthAndYear(currentMonth, currentYear);
+
+        // 切換場景
+        Scene scene = ((Node) event.getSource()).getScene();
+        scene.setRoot(monthRoot);
+    }
+
+
 }
