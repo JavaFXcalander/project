@@ -184,6 +184,5 @@ public class Controller {
         Scene scene = ((Node) event.getSource()).getScene();
         scene.setRoot(monthRoot);
     }
-
-
+    
 }

@@ -45,7 +45,6 @@
                     <Insets top="10" right="10" bottom="10" left="10" />
                 </padding>
                 <Button text="Index" onAction="#handleIndexButton" styleClass="index-button" />
-                <Button text="Notes" styleClass="notes-button" />
                 <Button text="project" onAction="#handleProjectButton" styleClass="lifestyle-button" />
                 <Button text="Stickers" styleClass="stickers-button" />
             </HBox>
