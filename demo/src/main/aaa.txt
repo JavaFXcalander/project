@@ -3,3 +3,32 @@ javac -d out -cp ".;JavaFx\javafx-sdk-24.0.1\lib\*" src\main\*.java
 cp -r src/main/resources/* out/main/resources/ 
 
 java --module-path JavaFx\javafx-sdk-24.0.1\lib --add-modules javafx.controls,javafx.fxml -cp out main.Main
+
+///////////////////////////
+javac -d out -cp ".;JavaFx\javafx-sdk-24.0.1\lib\*;lib\ormlite-core-6.1.jar;lib\ormlite-jdbc-6.1.jar;lib\h2-2.2.224.jar" src\main\Main.java src\main\Controller.java src\main\CalendarController.java src\main\models\ProjectModel.java src\main\database\DiaryDatabase.java
+
+java --module-path JavaFx\javafx-sdk-24.0.1\lib --add-modules javafx.controls,javafx.fxml -cp "out;lib\ormlite-core-6.1.jar;lib\ormlite-jdbc-6.1.jar;lib\h2-2.2.224.jar" main.Main
+
+
+
+@FXML
+    private void handleProjectButton(ActionEvent event) throws IOException {
+        // 如果 center 部分已經被替換過，則不再加載
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/project.fxml"));
+        Parent projectRoot = loader.load();
+
+        // 獲取 ProjectController 並傳遞當前月份和年份
+        Controller projectController = loader.getController();
+        if (projectController != null) {
+            int month = currentDate.getMonthValue();
+            int year = currentDate.getYear();
+            projectController.setMonth(month, year);  // 傳遞月份和年份
+        }
+
+        // 獲取當前場景，並將 Project 頁面設置為 BorderPane 的 center
+        // Scene scene = ((Node) event.getSource()).getScene();
+        // BorderPane root = (BorderPane) scene.getRoot();
+        // root.setCenter(projectRoot);  // 只替換 center 部分
+        Scene scene = calendarGrid.getScene();
+        scene.setRoot(projectRoot);
+    }

@@ -32,7 +32,7 @@
                 </columnConstraints>
 
                 <!-- Row 0: Project Name -->
-                <TextField promptText="project1" GridPane.columnSpan="2" prefWidth="600" GridPane.rowIndex="0" styleClass="inner-field"/>
+                <TextField promptText="project1"  fx:id = "project1" GridPane.columnSpan="2" prefWidth="600" GridPane.rowIndex="0" styleClass="inner-field"/>
 
                 <!-- Row 1: ProgressBar - 高度加大到30 -->
                 <ProgressBar fx:id="progressBar1" prefWidth="630" prefHeight="40" style="-fx-accent: #4CAF50; -fx-pref-height: 10px; -fx-min-height: 10px; -fx-max-height: 10px;" GridPane.columnSpan="2" GridPane.rowIndex="1"/>

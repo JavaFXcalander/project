@@ -21,6 +21,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
+import javafx.application.Platform;
+
+
 public class CalendarController {
 
     @FXML
@@ -218,27 +221,27 @@ public class CalendarController {
         System.out.println("Clicked date: " + date);
     }
 
-    @FXML
+   @FXML
     private void handleProjectButton(ActionEvent event) throws IOException {
-        // 如果 center 部分已經被替換過，則不再加載
         FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/project.fxml"));
         Parent projectRoot = loader.load();
-
-        // 獲取 ProjectController 並傳遞當前月份和年份
         Controller projectController = loader.getController();
-        if (projectController != null) {
-            int month = currentDate.getMonthValue();
-            int year = currentDate.getYear();
-            projectController.setMonth(month, year);  // 傳遞月份和年份
-        }
 
-        // 獲取當前場景，並將 Project 頁面設置為 BorderPane 的 center
-        // Scene scene = ((Node) event.getSource()).getScene();
-        // BorderPane root = (BorderPane) scene.getRoot();
-        // root.setCenter(projectRoot);  // 只替換 center 部分
         Scene scene = calendarGrid.getScene();
         scene.setRoot(projectRoot);
+
+        // ✅ 等 FXML 初始化完成後再設定
+        Platform.runLater(() -> {
+            if (projectController != null) {
+                int month = currentDate.getMonthValue();
+                int year = currentDate.getYear();
+                //projectController.loadProjectContent(year, month);
+                projectController.loadProjectContent(year, month);
+                projectController.setMonth(month, year);
+            }
+        });
     }
+
 
     @FXML
     private void handleIndexButton(ActionEvent event) throws IOException {

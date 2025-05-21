@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +20,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.Node; // 導入 Node 類
 import javafx.scene.Scene; // 確保導入 Scene 類
+
+import main.database.DiaryDatabase;
+import main.models.ProjectModel;
+
 
 
 public class Controller {
@@ -46,6 +51,11 @@ public class Controller {
 
     private int currentMonth;
     private int currentYear;
+    private DiaryDatabase database = DiaryDatabase.getInstance();
+
+    @FXML
+    private TextField project1;
+
 
     @FXML
     public void initialize() {
@@ -69,6 +79,11 @@ public class Controller {
                 }
             }
         }
+        //loadProjectContent(currentYear, currentMonth);
+        
+        // 設定所有輸入欄位的失焦事件處理
+        setupBlurEventHandlers();
+
     }
 
     private void setupProgressBar(VBox taskContainer, ProgressBar progressBar) {
@@ -184,5 +199,52 @@ public class Controller {
         Scene scene = ((Node) event.getSource()).getScene();
         scene.setRoot(monthRoot);
     }
+
+    public void loadProjectContent(int year, int month) {
+        // 從數據庫中加載選定日期的日記內容
+        ProjectModel entry = database.getProjectEntry(year,month);
+        
+        if (entry != null) {
+            // 填充UI元素
+            if (entry.getProject1() != null) {
+                project1.setText(entry.getProject1());
+                System.out.println(entry.projectName1);
+                System.out.println("有哦");
+                System.out.println(entry.getProject1()+"aaa");
+            } else {
+                System.out.println("該日期的項目1為空");
+                project1.setText("");
+            }
+        } else {
+            // 如果沒有找到該日期的條目，清空所有欄位
+            project1.clear();
+            System.out.println("沒");
+        }
+    }
+
+    private void setupBlurEventHandlers() {
+        // 為每個輸入欄位添加失焦事件處理器
+        project1.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+          
+    }
+
+    private void saveProjectEntry() {
+        ProjectModel entry = new ProjectModel(currentYear, currentMonth);
+        System.out.println(currentYear + " " + currentMonth);
+        System.out.println("string = "+ project1.getText());
+        entry.setProject1(project1.getText());
+
+        
+        
+        // 保存到數據庫
+        System.out.println(entry.projectName1);
+        database.saveProject(entry);
+    }
+
+    
     
 }
