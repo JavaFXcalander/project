@@ -169,6 +169,8 @@ public class Controller {
         // 使用月份和年份設置標籤的文本
         String monthName = LocalDate.of(year, month, 1).getMonth().getDisplayName(TextStyle.FULL, Locale.US);
         monthYearLabel.setText(year +" " + monthName + " " + "project");
+        loadProjectContent(year, month);
+
     }
 
     @FXML

@@ -60,6 +60,7 @@ public class DiaryDatabase {
                 ProjectModel existingProject = existingProjects.get(0);
                 existingProject.setProject1(project.getProject1());
                 
+
                 // 更新邏輯...
                 projectDao.update(existingProject);
             } else {

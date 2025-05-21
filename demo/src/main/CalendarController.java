@@ -221,6 +221,8 @@ public class CalendarController {
         System.out.println("Clicked date: " + date);
     }
 
+
+    //有改到
    @FXML
     private void handleProjectButton(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/project.fxml"));
@@ -236,7 +238,7 @@ public class CalendarController {
                 int month = currentDate.getMonthValue();
                 int year = currentDate.getYear();
                 //projectController.loadProjectContent(year, month);
-                projectController.loadProjectContent(year, month);
+                //projectController.loadProjectContent(year, month);
                 projectController.setMonth(month, year);
             }
         });
