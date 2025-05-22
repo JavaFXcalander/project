@@ -105,22 +105,23 @@
     -fx-background-color: transparent;
     -fx-control-inner-background: transparent;
     -fx-background-insets: 0;
-    -fx-prompt-text-fill: #9e9e9e;
+    -fx-prompt-text-fill: #9e9e9e;  /* 提示文字的顏色 */
+    -fx-text-fill: #000000;         /* 輸入文字的顏色（黑色） */
     -fx-font-family: "Times New Roman", serif;
     -fx-font-size: 14px;
 }
 
-
 .inner-field2:hover {
     -fx-background-color: #f0e8d8;
     -fx-control-inner-background: #f0e8d8;
+    -fx-text-fill: #000000;         /* 確保 hover 時文字顏色不變 */
 }
-
 
 .inner-field2:focused {
     -fx-background-color: #fff8e8;
     -fx-control-inner-background: #fff8e8;
-} 
+    -fx-text-fill: #000000;         /* 確保聚焦時文字顏色不變 */
+}
 
 .check-box {
     -fx-font-family: "Segoe UI";

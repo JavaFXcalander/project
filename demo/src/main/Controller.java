@@ -20,6 +20,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.Node; // 導入 Node 類
 import javafx.scene.Scene; // 確保導入 Scene 類
+import javafx.scene.control.TextArea;
+
 
 import main.database.DiaryDatabase;
 import main.models.ProjectModel;
@@ -55,6 +57,38 @@ public class Controller {
 
     @FXML
     private TextField project1;
+    @FXML
+    private TextField project2;
+    @FXML
+    private TextField project3;
+    @FXML
+    private TextField project4;
+
+    @FXML
+    private TextArea about1;
+
+    @FXML
+    private TextArea about2;
+
+    @FXML
+    private TextArea about3;
+
+    @FXML
+    private TextArea about4;
+
+    @FXML
+    private TextField habit1;
+
+    @FXML
+    private TextField habit2;
+
+    @FXML
+    private TextField habit3;
+
+    @FXML
+    private TextField habit4;
+
+
 
 
     @FXML
@@ -208,15 +242,24 @@ public class Controller {
         
         if (entry != null) {
             // 填充UI元素
-            if (entry.getProject1() != null) {
                 project1.setText(entry.getProject1());
-                System.out.println(entry.projectName1);
-                System.out.println("有哦");
-                System.out.println(entry.getProject1()+"aaa");
-            } else {
-                System.out.println("該日期的項目1為空");
-                project1.setText("");
-            }
+                System.out.println("get = "+ entry.getProject2());
+                project2.setText(entry.getProject2());
+                project3.setText(entry.getProject3());
+                project4.setText(entry.getProject4());
+                about1.setText(entry.getAbout1());
+                about2.setText(entry.getAbout2());
+                about3.setText(entry.getAbout3());
+                about4.setText(entry.getAbout4());
+                habit1.setText(entry.getHabit1());
+                habit2.setText(entry.getHabit2());
+                habit3.setText(entry.getHabit3());
+                habit4.setText(entry.getHabit4());
+    
+            // } else {
+            //     System.out.println("該日期的項目1為空");
+            //     project1.setText("");
+            // }
         } else {
             // 如果沒有找到該日期的條目，清空所有欄位
             project1.clear();
@@ -231,14 +274,81 @@ public class Controller {
                 saveProjectEntry();
             }
         });
+        project2.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        project3.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        project4.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        about1.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        about2.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        about3.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        about4.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        habit1.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        habit2.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        habit3.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+        habit4.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                saveProjectEntry();
+            }
+        });
+
           
     }
 
     private void saveProjectEntry() {
         ProjectModel entry = new ProjectModel(currentYear, currentMonth);
         System.out.println(currentYear + " " + currentMonth);
-        System.out.println("string = "+ project1.getText());
         entry.setProject1(project1.getText());
+        entry.setProject2(project2.getText());
+        System.out.println("string = "+ entry.getProject2());
+        entry.setProject3(project3.getText());
+        entry.setProject4(project4.getText());
+        entry.setAbout1(about1.getText());
+        entry.setAbout2(about2.getText());
+        entry.setAbout3(about3.getText());
+        entry.setAbout4(about4.getText());
+        entry.setHabit1(habit1.getText());
+        entry.setHabit2(habit2.getText());
+        entry.setHabit3(habit3.getText());
+        entry.setHabit4(habit4.getText());
 
         
         

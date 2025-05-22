@@ -56,36 +56,27 @@ public class DiaryDatabase {
             .and()                       // 邏輯"且"
             .eq("month", project.getMonth()) // 條件2：月份匹配
             .query();                    // 執行查詢
-            if (!existingProjects.isEmpty()) {
-                ProjectModel existingProject = existingProjects.get(0);
-                existingProject.setProject1(project.getProject1());
-                
 
-                // 更新邏輯...
+            ProjectModel existingProject = existingProjects.get(0);
+            if (existingProject != null) {
+                existingProject.setProject1(project.getProject1());
+                existingProject.setProject2(project.getProject2());
+                System.out.println("Project 2: " + project.getProject2());
+                existingProject.setProject3(project.getProject3());
+                existingProject.setProject4(project.getProject4());
+                existingProject.setAbout1(project.getAbout1());
+                existingProject.setAbout2(project.getAbout2());
+                existingProject.setAbout3(project.getAbout3());
+                existingProject.setAbout4(project.getAbout4());
+                existingProject.setHabit1(project.getHabit1());
+                existingProject.setHabit2(project.getHabit2());
+                existingProject.setHabit3(project.getHabit3());
+                existingProject.setHabit4(project.getHabit4());
                 projectDao.update(existingProject);
             } else {
+                // 如果不存在，創建新的專案
                 projectDao.create(project);
             }
-
-            // ProjectModel existingProject = existingProjects.get(0);
-            // if (existingProject != null) {
-            //     existingProject.setProject1(project.getProject1());
-            //     // existingProject.setProject2(project.getProject2());
-            //     // existingProject.setProject3(project.getProject3());
-            //     // existingProject.setProject4(project.getProject4());
-            //     // existingProject.setAbout1(project.getAbout1());
-            //     // existingProject.setAbout2(project.getAbout2());
-            //     // existingProject.setAbout3(project.getAbout3());
-            //     // existingProject.setAbout4(project.getAbout4());
-            //     // existingProject.setHabit1(project.getHabit1());
-            //     // existingProject.setHabit2(project.getHabit2());
-            //     // existingProject.setHabit3(project.getHabit3());
-            //     // existingProject.setHabit4(project.getHabit4());
-            //     projectDao.update(existingProject);
-            // } else {
-            //     // 如果不存在，創建新的專案
-            //     projectDao.create(project);
-            // }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to save project", e);
         }
@@ -111,7 +102,7 @@ public class DiaryDatabase {
                 try {
                     connectionSource.close();
                 } catch (Exception e) {
-                    e.printStackTrace(); // 或你想怎麼處理
+                    e.printStackTrace(); // 或更適當的錯誤處理
                 }
             }
         } catch (Exception e) {

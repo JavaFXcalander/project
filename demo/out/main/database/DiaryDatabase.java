@@ -60,17 +60,18 @@ public class DiaryDatabase {
             ProjectModel existingProject = existingProjects.get(0);
             if (existingProject != null) {
                 existingProject.setProject1(project.getProject1());
-                // existingProject.setProject2(project.getProject2());
-                // existingProject.setProject3(project.getProject3());
-                // existingProject.setProject4(project.getProject4());
-                // existingProject.setAbout1(project.getAbout1());
-                // existingProject.setAbout2(project.getAbout2());
-                // existingProject.setAbout3(project.getAbout3());
-                // existingProject.setAbout4(project.getAbout4());
-                // existingProject.setHabit1(project.getHabit1());
-                // existingProject.setHabit2(project.getHabit2());
-                // existingProject.setHabit3(project.getHabit3());
-                // existingProject.setHabit4(project.getHabit4());
+                existingProject.setProject2(project.getProject2());
+                System.out.println("Project 2: " + project.getProject2());
+                existingProject.setProject3(project.getProject3());
+                existingProject.setProject4(project.getProject4());
+                existingProject.setAbout1(project.getAbout1());
+                existingProject.setAbout2(project.getAbout2());
+                existingProject.setAbout3(project.getAbout3());
+                existingProject.setAbout4(project.getAbout4());
+                existingProject.setHabit1(project.getHabit1());
+                existingProject.setHabit2(project.getHabit2());
+                existingProject.setHabit3(project.getHabit3());
+                existingProject.setHabit4(project.getHabit4());
                 projectDao.update(existingProject);
             } else {
                 // 如果不存在，創建新的專案
