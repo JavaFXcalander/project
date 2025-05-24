@@ -57,11 +57,10 @@ public class DiaryDatabase {
             .eq("month", project.getMonth()) // 條件2：月份匹配
             .query();                    // 執行查詢
 
-            ProjectModel existingProject = existingProjects.get(0);
-            if (existingProject != null) {
+           if (!existingProjects.isEmpty()) {
+                ProjectModel existingProject = existingProjects.get(0);
                 existingProject.setProject1(project.getProject1());
                 existingProject.setProject2(project.getProject2());
-                System.out.println("Project 2: " + project.getProject2());
                 existingProject.setProject3(project.getProject3());
                 existingProject.setProject4(project.getProject4());
                 existingProject.setAbout1(project.getAbout1());
@@ -72,9 +71,9 @@ public class DiaryDatabase {
                 existingProject.setHabit2(project.getHabit2());
                 existingProject.setHabit3(project.getHabit3());
                 existingProject.setHabit4(project.getHabit4());
+                existingProject.setDailyChecks(project.getDailyChecks());
                 projectDao.update(existingProject);
             } else {
-                // 如果不存在，創建新的專案
                 projectDao.create(project);
             }
         } catch (SQLException e) {

@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
+
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -87,6 +90,40 @@ public class Controller {
 
     @FXML
     private TextField habit4;
+
+    // 每日勾選用的 VBox 容器
+    @FXML private VBox dayContainer1;
+    @FXML private VBox dayContainer2;
+    @FXML private VBox dayContainer3;
+    @FXML private VBox dayContainer4;
+    @FXML private VBox dayContainer5;
+    @FXML private VBox dayContainer6;
+    @FXML private VBox dayContainer7;
+    @FXML private VBox dayContainer8;
+    @FXML private VBox dayContainer9;
+    @FXML private VBox dayContainer10;
+    @FXML private VBox dayContainer11;
+    @FXML private VBox dayContainer12;
+    @FXML private VBox dayContainer13;
+    @FXML private VBox dayContainer14;
+    @FXML private VBox dayContainer15;
+    @FXML private VBox dayContainer16;
+    @FXML private VBox dayContainer17;
+    @FXML private VBox dayContainer18;
+    @FXML private VBox dayContainer19;
+    @FXML private VBox dayContainer20;
+    @FXML private VBox dayContainer21;
+    @FXML private VBox dayContainer22;
+    @FXML private VBox dayContainer23;
+    @FXML private VBox dayContainer24;
+    @FXML private VBox dayContainer25;
+    @FXML private VBox dayContainer26;
+    @FXML private VBox dayContainer27;
+    @FXML private VBox dayContainer28;
+    @FXML private VBox dayContainer29;
+    @FXML private VBox dayContainer30;
+    @FXML private VBox dayContainer31;
+
 
 
 
@@ -210,6 +247,7 @@ public class Controller {
     @FXML
     private void handleBackToCalendar(ActionEvent event) throws IOException {
         // 加載 Calendar 頁面
+        saveProjectEntry();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("resources/calendar.fxml"));
         Parent calendarRoot = loader.load();
 
@@ -255,11 +293,25 @@ public class Controller {
                 habit2.setText(entry.getHabit2());
                 habit3.setText(entry.getHabit3());
                 habit4.setText(entry.getHabit4());
+
+                Map<Integer, boolean[]> dailyChecks = entry.getDailyChecks();
+                for (int day = 1; day <= 31; day++) {
+                    try {
+                        VBox dayContainer = (VBox) getClass().getDeclaredField("dayContainer" + day).get(this);
+                        boolean[] checks = dailyChecks.getOrDefault(day, new boolean[4]);
+                        for (int i = 0; i < 4; i++) {
+                            CheckBox checkBox = (CheckBox) dayContainer.getChildren().get(i + 1);
+                            checkBox.setSelected(checks[i]);
+                        }
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
     
             // } else {
             //     System.out.println("該日期的項目1為空");
             //     project1.setText("");
-            // }
+            // 
         } else {
             // 如果沒有找到該日期的條目，清空所有欄位
             project1.clear();
@@ -338,7 +390,7 @@ public class Controller {
         System.out.println(currentYear + " " + currentMonth);
         entry.setProject1(project1.getText());
         entry.setProject2(project2.getText());
-        System.out.println("string = "+ entry.getProject2());
+        //System.out.println("string = "+ entry.getProject2());
         entry.setProject3(project3.getText());
         entry.setProject4(project4.getText());
         entry.setAbout1(about1.getText());
@@ -349,12 +401,36 @@ public class Controller {
         entry.setHabit2(habit2.getText());
         entry.setHabit3(habit3.getText());
         entry.setHabit4(habit4.getText());
+        Map<Integer, boolean[]> dailyChecks = collectDailyChecks();
+        entry.setDailyChecks(dailyChecks);
 
-        
-        
+    
         // 保存到數據庫
-        System.out.println(entry.projectName1);
+        //System.out.println(entry.projectName1);
         database.saveProject(entry);
+    }
+
+    private Map<Integer, boolean[]> collectDailyChecks() {
+        Map<Integer, boolean[]> dailyChecks = new HashMap<>();
+        
+        // 假設您的UI中有31天的VBox容器，命名為dayContainer1~dayContainer31
+        for (int day = 1; day <= 31; day++) {
+            try {
+                // 動態獲取每天的VBox（例如：dayContainer1）
+                VBox dayContainer = (VBox) getClass().getDeclaredField("dayContainer" + day).get(this);
+                
+                boolean[] checks = new boolean[4];
+                for (int i = 0; i < 4; i++) {
+                    CheckBox checkBox = (CheckBox) dayContainer.getChildren().get(i + 1); // 跳過Label
+                    checks[i] = checkBox.isSelected();
+                }
+                dailyChecks.put(day, checks);
+            } catch (Exception e) {
+                // 如果某天的容器不存在，跳過
+                continue;
+            }
+        } 
+        return dailyChecks;
     }
 
     

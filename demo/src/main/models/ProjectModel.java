@@ -2,8 +2,13 @@ package main.models;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.j256.ormlite.field.DataType;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @DatabaseTable(tableName = "project_entries")
 public class ProjectModel {
@@ -53,6 +58,10 @@ public class ProjectModel {
 
     @DatabaseField
     private String habit4;
+
+    @DatabaseField(dataType = DataType.LONG_STRING)
+    private String dailyChecksJson; // 儲存每日勾選狀態的JSON
+
 
 
 
@@ -183,7 +192,16 @@ public class ProjectModel {
         this.habit4 = habit4;
     }
 
+    public Map<Integer, boolean[]> getDailyChecks() {
+        if (dailyChecksJson == null || dailyChecksJson.isEmpty()) {
+            return new HashMap<>();
+        }
+        return new Gson().fromJson(dailyChecksJson, new TypeToken<Map<Integer, boolean[]>>(){}.getType());
+    }
+
+    // 设置每日勾選狀態
+    public void setDailyChecks(Map<Integer, boolean[]> dailyChecks) {
+        this.dailyChecksJson = new Gson().toJson(dailyChecks);
+    }
 
 }
-
-    
