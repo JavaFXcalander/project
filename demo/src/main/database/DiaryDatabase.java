@@ -7,6 +7,7 @@ import java.io.IOException;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import main.models.ProjectModel;
+import main.models.UserModel;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ public class DiaryDatabase {
     private ConnectionSource connectionSource;
     //private Dao<DiaryModel, Integer> diaryDao;
     private Dao<ProjectModel, Integer> projectDao;
+    private Dao<UserModel, Integer> userDao;
 
     private DiaryDatabase() {
         try {
@@ -27,10 +29,12 @@ public class DiaryDatabase {
             // 創建資料表
             //TableUtils.createTableIfNotExists(connectionSource, DiaryModel.class);
             TableUtils.createTableIfNotExists(connectionSource, ProjectModel.class);
+            TableUtils.createTableIfNotExists(connectionSource, UserModel.class);
             
             // 初始化 DAO
             //diaryDao = DaoManager.createDao(connectionSource, DiaryModel.class);
             projectDao = DaoManager.createDao(connectionSource, ProjectModel.class);
+            userDao = DaoManager.createDao(connectionSource, UserModel.class);
             
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
@@ -48,14 +52,21 @@ public class DiaryDatabase {
 
     
     // 專案相關操作
-    public void saveProject(ProjectModel project) {
+    public void saveProject(ProjectModel project , String userEmail) {
         try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) throw new RuntimeException("User not found");
+
+            project.setUser(user); // 确保关联用户
+
             List<ProjectModel> existingProjects = projectDao.queryBuilder()
             .where()
-            .eq("year", project.getYear())  // 條件1：年份匹配
-            .and()                       // 邏輯"且"
-            .eq("month", project.getMonth()) // 條件2：月份匹配
-            .query();                    // 執行查詢
+            .eq("year", project.getYear())
+            .and()
+            .eq("month", project.getMonth())
+            .and()
+            .eq("user_id", user.getId())
+            .query();
 
            if (!existingProjects.isEmpty()) {
                 ProjectModel existingProject = existingProjects.get(0);
@@ -81,20 +92,51 @@ public class DiaryDatabase {
         }
     }
 
-    public ProjectModel getProjectEntry(int year, int month) {
-    try {
-        List<ProjectModel> projects = projectDao.queryBuilder()
-            .where()
-            .eq("year", year)
-            .and()
-            .eq("month", month)
-            .query();
-        
-        return projects.isEmpty() ? null : projects.get(0);
+    public ProjectModel getProjectEntry(int year, int month, String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) return null;
+            List<ProjectModel> projects = projectDao.queryBuilder()
+                .where()
+                .eq("year", year)
+                .and()
+                .eq("month", month)
+                .and()
+                .eq("user_id", user.getId())
+                .query();
+
+            return projects.isEmpty() ? null : projects.get(0);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get project entry", e);
         }
     }
+
+    public UserModel getUserEntry(String email) {
+        try {
+            // Query directly for the email, which is more efficient.
+            // Assumes 'email' field is indexed or query is on a small table.
+            List<UserModel> users = userDao.queryForEq("email", email);
+            if (users != null && !users.isEmpty()) {
+                return users.get(0); // Email should be unique
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get user entry for email: " + email, e);
+        }
+    }
+
+    public void saveUserEntry(UserModel entry) {
+        try {
+            
+            userDao.create(entry);
+        } catch (SQLException e) {
+            // Wrap SQLException in a RuntimeException to simplify error handling upstream,
+            // consistent with other database operations in this class.
+            throw new RuntimeException("Failed to save user entry: " + e.getMessage(), e);
+        }
+    }
+
+
     public void close() {
         try {
             if (connectionSource != null) {

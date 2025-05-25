@@ -1,8 +1,8 @@
 package main; // Package updated based on list_dir
 
-import com.taskmanager.services.UserService; // Corrected UserService import
-import com.taskmanager.services.AuthApi.AuthStatus; // Import AuthStatus
-import com.taskmanager.services.UserSession; // Import UserSession
+import main.services.UserService; // Corrected UserService import
+import main.services.AuthApi.AuthStatus; // Import AuthStatus
+import main.services.UserSession; // Import UserSession
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,7 +53,7 @@ public class LoginController {
                 // Set the current user email in the UserSession
                 UserSession.getInstance().setCurrentUserEmail(email);
                 try {
-                    mainScene(event, "/fxml/calendar.fxml", "My Diary Planner");
+                    mainScene(event, "/main/resources/calendar.fxml", "My Diary Planner");
                 } catch (IOException e) {
                     e.printStackTrace();
                     errorMessageLabel.setText("Error loading application.");
@@ -81,7 +81,7 @@ public class LoginController {
     @FXML
     private void handleRegisterLink(ActionEvent event) {
         try {
-            switchScene(event, "/fxml/register.fxml", "Register");
+            switchScene(event, "/main/resources/register.fxml", "Register");
         } catch (IOException e) {
             e.printStackTrace();
             errorMessageLabel.setText("Error loading registration page.");
@@ -103,7 +103,7 @@ public class LoginController {
     private void mainScene(ActionEvent event, String fxmlFile, String title) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root, 1200, 1000); // Match scene size from MainApp
+        Scene scene = new Scene(root, 900, 600); // Match scene size from MainApp
         stage.setTitle(title);
         stage.setScene(scene);
 

@@ -28,6 +28,8 @@ import javafx.scene.control.TextArea;
 
 import main.database.DiaryDatabase;
 import main.models.ProjectModel;
+import main.services.UserSession;
+import main.models.UserModel;
 
 
 
@@ -123,9 +125,6 @@ public class Controller {
     @FXML private VBox dayContainer29;
     @FXML private VBox dayContainer30;
     @FXML private VBox dayContainer31;
-
-
-
 
 
     @FXML
@@ -276,7 +275,14 @@ public class Controller {
 
     public void loadProjectContent(int year, int month) {
         // 從數據庫中加載選定日期的日記內容
-        ProjectModel entry = database.getProjectEntry(year,month);
+        ProjectModel entry;
+        UserSession userSession = UserSession.getInstance();
+
+        if (userSession.isLoggedIn()) {
+            entry = database.getProjectEntry(year, month, userSession.getCurrentUserEmail());
+        } else {
+            return;
+        }
         
         if (entry != null) {
             // 填充UI元素
@@ -387,7 +393,7 @@ public class Controller {
 
     private void saveProjectEntry() {
         ProjectModel entry = new ProjectModel(currentYear, currentMonth);
-        System.out.println(currentYear + " " + currentMonth);
+        //System.out.println(currentYear + " " + currentMonth);
         entry.setProject1(project1.getText());
         entry.setProject2(project2.getText());
         //System.out.println("string = "+ entry.getProject2());
@@ -404,10 +410,17 @@ public class Controller {
         Map<Integer, boolean[]> dailyChecks = collectDailyChecks();
         entry.setDailyChecks(dailyChecks);
 
+        UserSession userSession = UserSession.getInstance();
+        String email = userSession.getCurrentUserEmail();;
+        if (userSession.isLoggedIn()) {
+            UserModel user = database.getUserEntry(email);
+            if (user != null) {
+                entry.setUser(user);
+            }
+        }
     
         // 保存到數據庫
-        //System.out.println(entry.projectName1);
-        database.saveProject(entry);
+        database.saveProject(entry ,email);
     }
 
     private Map<Integer, boolean[]> collectDailyChecks() {

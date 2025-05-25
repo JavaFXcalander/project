@@ -1,7 +1,7 @@
 package main; // Package updated based on list_dir
 
-import com.taskmanager.services.UserService; // Corrected UserService import
-import com.taskmanager.services.AuthApi.AuthStatus; // Import AuthStatus
+import main.services.UserService; // Corrected UserService import
+import main.services.AuthApi.AuthStatus; // Import AuthStatus
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -61,7 +61,7 @@ public class RegisterController {
                 errorMessageLabel.setText(""); // Clear error message
                 System.out.println("Registration successful! Navigating to login.");
                 try {
-                    switchScene(event, "/fxml/login.fxml", "Login");
+                    switchScene(event, "/main/resources/login.fxml", "Login");
                 } catch (IOException e) {
                     e.printStackTrace();
                     errorMessageLabel.setText("Error loading login page.");
@@ -89,7 +89,7 @@ public class RegisterController {
     private void handleLoginLink(ActionEvent event) {
         try {
             // Navigate to the login screen
-            switchScene(event, "/fxml/login.fxml", "Login");
+            switchScene(event, "/main/resources/login.fxml", "Login");
         } catch (IOException e) {
             e.printStackTrace();
             errorMessageLabel.setText("Error loading login page.");

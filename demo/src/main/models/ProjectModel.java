@@ -15,6 +15,10 @@ public class ProjectModel {
     @DatabaseField(generatedId = true)
     private int id;
 
+    @DatabaseField(foreign = true, columnName = "user_id")
+    private UserModel user;
+
+
     @DatabaseField(canBeNull = false)
     private int year;
 
@@ -202,6 +206,14 @@ public class ProjectModel {
     // 设置每日勾選狀態
     public void setDailyChecks(Map<Integer, boolean[]> dailyChecks) {
         this.dailyChecksJson = new Gson().toJson(dailyChecks);
+    }
+
+    public UserModel getUser() {
+        return user;
+    }
+    
+    public void setUser(UserModel user) {
+        this.user = user;
     }
 
 }
