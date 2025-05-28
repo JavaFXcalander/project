@@ -6,7 +6,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.paint.Color?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="main.CalendarController" stylesheets="@style.css">
+<BorderPane xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="main.CalendarController"
+            stylesheets="@styles.css">
     
     <!-- Top: Title and Navigation -->
     <top>
@@ -35,6 +36,56 @@
             </GridPane>
         </VBox>
     </center>
+    
+    <!-- Right: Event Editing Panel -->
+    <right>
+        <VBox spacing="10" alignment="TOP_CENTER" prefWidth="300" styleClass="event-panel">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+            <Label text="事件編輯" styleClass="section-header" />
+            
+            <Label text="開始日期:" />
+            <HBox spacing="5">
+                <TextField fx:id="eventDateField" promptText="YYYY-MM-DD" HBox.hgrow="ALWAYS" />
+                <Button text="今天" onAction="#handleSetTodayDate" />
+            </HBox>
+            
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <CheckBox fx:id="continuousEventCheckBox" text="連續事件" onAction="#handleContinuousEventToggle" />
+            </HBox>
+            
+            <Label fx:id="endDateLabel" text="結束日期:" />
+            <HBox spacing="5">
+                <TextField fx:id="eventEndDateField" promptText="YYYY-MM-DD" HBox.hgrow="ALWAYS" />
+                <Button text="設為同日" onAction="#handleSetSameDate" />
+            </HBox>
+            
+            <Label text="事件名稱:" />
+            <TextField fx:id="eventNameField" promptText="請輸入事件名稱" />
+            
+            <Label text="時間:" />
+            <TextField fx:id="eventTimeField" promptText="HH:MM" />
+            
+            <Label text="顏色:" />
+            <ColorPicker fx:id="eventColorPicker" />
+            
+            <HBox spacing="10" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+                <Button text="添加/更新事件" onAction="#handleAddUpdateEvent" />
+                <Button text="刪除事件" onAction="#handleDeleteEvent" />
+            </HBox>
+            
+            <Separator />
+            
+            <Label text="事件列表" styleClass="section-header" />
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="日期：" />
+                <Label fx:id="eventListDateLabel" text="..." />
+                <Button text="顯示" onAction="#handleShowEvents" />
+            </HBox>
+            <ListView fx:id="eventListView" VBox.vgrow="ALWAYS" />
+        </VBox>
+    </right>
 
     <!-- Bottom: Navigation and Footer -->
     <bottom>
@@ -43,9 +94,8 @@
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10" />
                 </padding>
-                <Button text="Index" onAction="#handleIndexButton" styleClass="index-button" />
-                <Button text="project" onAction="#handleProjectButton" styleClass="lifestyle-button" />
-                <Button text="Stickers" styleClass="stickers-button" />
+                <Button text="Month" styleClass="Month-button"/>
+                <Button text="Project" styleClass="Project-button" onAction="#handleProjectButton"/>
             </HBox>
             <HBox spacing="5" alignment="CENTER">
                 <padding>

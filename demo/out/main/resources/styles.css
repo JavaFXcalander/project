@@ -133,3 +133,25 @@
     -fx-text-fill: #888;
     -fx-font-family: "Times New Roman", serif;
 }
+
+.Month-button {
+    -fx-background-color: #d6ccc2;
+    -fx-text-fill: #888;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-padding: 8 16;
+    -fx-border-color: #d6ccc2;
+    -fx-border-radius: 5;
+    -fx-font-family: "Times New Roman", serif;
+}
+
+.Project-button {
+    -fx-background-color: #e3d5ca;
+    -fx-text-fill: #888;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-padding: 8 16;
+    -fx-border-color: #e3d5ca;
+    -fx-border-radius: 5;
+    -fx-font-family: "Times New Roman", serif;
+}
