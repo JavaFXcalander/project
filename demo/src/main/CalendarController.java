@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import main.services.UserSession;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -59,7 +60,21 @@ public class CalendarController {
      */
     public void initialize() {
         // 創建輔助類實例
+
+        if (!UserSession.getInstance().isLoggedIn()) {
+            System.err.println("Warning: No user logged in");
+            return;
+        }
+        
+        // 從 UserSession 獲取用戶郵箱（這是唯一的重要修改）
+        String userEmail = UserSession.getInstance().getCurrentUserEmail();
+        
+        // 創建輔助類實例（保持你原有的代碼）
         eventManager = new EventManager();
+        
+        // 設置當前用戶（修改這行）
+        eventManager.setCurrentUser(userEmail);
+
         dateNavigator = new DateNavigator(eventManager);
         uiFactory = new UIFactory(eventManager, this);
         

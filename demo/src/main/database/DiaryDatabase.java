@@ -6,6 +6,8 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import java.io.IOException;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+
+import main.models.EventModel;
 import main.models.ProjectModel;
 import main.models.UserModel;
 
@@ -21,6 +23,7 @@ public class DiaryDatabase {
     //private Dao<DiaryModel, Integer> diaryDao;
     private Dao<ProjectModel, Integer> projectDao;
     private Dao<UserModel, Integer> userDao;
+    private Dao<EventModel, Integer> eventDao; 
 
     private DiaryDatabase() {
         try {
@@ -30,11 +33,13 @@ public class DiaryDatabase {
             //TableUtils.createTableIfNotExists(connectionSource, DiaryModel.class);
             TableUtils.createTableIfNotExists(connectionSource, ProjectModel.class);
             TableUtils.createTableIfNotExists(connectionSource, UserModel.class);
+            TableUtils.createTableIfNotExists(connectionSource, EventModel.class);
             
             // 初始化 DAO
             //diaryDao = DaoManager.createDao(connectionSource, DiaryModel.class);
             projectDao = DaoManager.createDao(connectionSource, ProjectModel.class);
             userDao = DaoManager.createDao(connectionSource, UserModel.class);
+            eventDao = DaoManager.createDao(connectionSource, EventModel.class);
             
         } catch (SQLException e) {
             throw new RuntimeException("Failed to initialize database", e);
@@ -110,6 +115,79 @@ public class DiaryDatabase {
             throw new RuntimeException("Failed to get project entry", e);
         }
     }
+
+
+    //事件相關操作
+    public void saveEvent(EventModel event, String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) throw new RuntimeException("User not found");
+            
+            event.setUser(user);
+            eventDao.create(event);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save event", e);
+        }
+    }
+    
+    public void updateEvent(EventModel event) {
+        try {
+            eventDao.update(event);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update event", e);
+        }
+    }
+    
+    public void deleteEvent(EventModel event) {
+        try {
+            eventDao.delete(event);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete event", e);
+        }
+    }
+    
+    public void deleteEventById(int eventId) {
+        try {
+            eventDao.deleteById(eventId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete event", e);
+        }
+    }
+    
+    public List<EventModel> getAllEventsForUser(String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) return List.of();
+            
+            return eventDao.queryBuilder()
+                .where()
+                .eq("user_id", user.getId())
+                .query();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get events for user", e);
+        }
+    }
+    
+    public List<EventModel> getEventsForDate(LocalDate date, String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) return List.of();
+            
+            String dateStr = date.toString();
+            return eventDao.queryBuilder()
+                .where()
+                .eq("user_id", user.getId())
+                .and()
+                .le("date", dateStr) // 事件開始日期 <= 查詢日期
+                .and()
+                .ge("endDate", dateStr) // 事件結束日期 >= 查詢日期
+                .query();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get events for date", e);
+        }
+    }
+    //新增
+
 
     public UserModel getUserEntry(String email) {
         try {

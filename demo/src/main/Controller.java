@@ -24,12 +24,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.Node; // 導入 Node 類
 import javafx.scene.Scene; // 確保導入 Scene 類
 import javafx.scene.control.TextArea;
+import javafx.application.Platform;
+
 
 
 import main.database.DiaryDatabase;
 import main.models.ProjectModel;
 import main.services.UserSession;
 import main.models.UserModel;
+import main.SimpleWebScraper;
 
 
 
@@ -92,6 +95,8 @@ public class Controller {
 
     @FXML
     private TextField habit4;
+
+    public String weather;
 
     // 每日勾選用的 VBox 容器
     @FXML private VBox dayContainer1;
@@ -238,9 +243,9 @@ public class Controller {
         this.currentYear = year;
         // 使用月份和年份設置標籤的文本
         String monthName = LocalDate.of(year, month, 1).getMonth().getDisplayName(TextStyle.FULL, Locale.US);
-        monthYearLabel.setText(year +" " + monthName + " " + "project");
+        monthYearLabel.setText(year +" " + monthName + " " + "project" );
         loadProjectContent(year, month);
-
+       
     }
 
     @FXML

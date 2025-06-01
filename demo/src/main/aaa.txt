@@ -22,5 +22,13 @@ java --module-path JavaFx\javafx-sdk-24.0.1\lib --add-modules javafx.controls,ja
 
 
 //////////////////
-javac -d out -cp ".;JavaFx\javafx-sdk-24.0.1\lib\*;lib\ormlite-core-6.1.jar;lib\ormlite-jdbc-6.1.jar;lib\h2-2.2.224.jar;lib\gson-2.13.1.jar;lib\jbcrypt-0.4.jar" src\main\*.java  src\main\services\AuthApi.java src\main\services\UserService.java src\main\services\UserSession.java src\main\models\ProjectModel.java src\main\models\UserModel.java src\main\database\DiaryDatabase.java
+javac -d out -cp ".;JavaFx\javafx-sdk-24.0.1\lib\*;lib\ormlite-core-6.1.jar;lib\ormlite-jdbc-6.1.jar;lib\h2-2.2.224.jar;lib\gson-2.13.1.jar;lib\jbcrypt-0.4.jar;lib\jsoup-1.20.1.jar" src\main\*.java  src\main\services\AuthApi.java src\main\services\UserService.java src\main\services\UserSession.java src\main\models\ProjectModel.java src\main\models\UserModel.java src\main\database\DiaryDatabase.java
 
+
+javac -d out -cp ".;JavaFx\javafx-sdk-24.0.1\lib\*;lib\ormlite-core-6.1.jar;lib\ormlite-jdbc-6.1.jar;lib\h2-2.2.224.jar;lib\gson-2.13.1.jar;lib\jbcrypt-0.4.jar;lib\jsoup-1.20.1.jar" src\main\*.java  src\main\services\AuthApi.java src\main\services\UserService.java src\main\services\UserSession.java src\main\models\ProjectModel.java src\main\models\UserModel.java src\main\models\EventModel.java src\main\database\DiaryDatabase.java
+
+zorange1121@gmail.com
+a1a1a1a1
+
+f74121131@gs.ncku.edu.tw
+bon1jour
