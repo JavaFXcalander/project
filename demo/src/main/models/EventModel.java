@@ -74,28 +74,18 @@ public class EventModel {
     public void setCollaborationEvent(boolean collaborationEvent) {
         isCollaborationEvent = collaborationEvent;
     }
-    
-    // 轉換為 Event 對象
+      // 轉換為 Event 對象
     public main.Event toEvent() {
         LocalDate eventDate = LocalDate.parse(this.date);
         LocalDate eventEndDate = LocalDate.parse(this.endDate);
         LocalTime eventTime = LocalTime.parse(this.time);
         Color eventColor = fromHex(this.colorHex);
-          String description = this.description;
-        // 只在協作事件中顯示創建者
-        if (this.isCollaborationEvent && this.user != null) {
-            String userEmail = this.user.getEmail();
-            // 添加 null 檢查，確保 userEmail 不為 null
-            if (userEmail != null) {
-                String userName = userEmail.split("@")[0];
-                description = "[" + userName + "] " + this.description;
-            }
-        }
         
+        // 直接使用原始描述，不添加創建者資訊
         if (this.isContinuous) {
-            return new main.Event(eventDate, eventEndDate, eventTime, description, eventColor);
+            return new main.Event(eventDate, eventEndDate, eventTime, this.description, eventColor);
         } else {
-            return new main.Event(eventDate, eventTime, description, eventColor);
+            return new main.Event(eventDate, eventTime, this.description, eventColor);
         }
     }
     

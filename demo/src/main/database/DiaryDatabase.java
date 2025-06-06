@@ -288,9 +288,7 @@ public class DiaryDatabase {
             event.setUser(user);
             event.setCollaborationEvent(true); // 標記為協作事件
             
-            // 添加創建者信息到描述中，這樣所有用戶都能看到誰創建了事件
-            String originalDesc = event.getDescription();
-            event.setDescription("[由 " + user.getEmail() + " 創建] " + originalDesc);
+            // 不再添加創建者信息到描述中
             
             eventDao.create(event);
         } catch (SQLException e) {
