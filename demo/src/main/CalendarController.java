@@ -23,6 +23,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.scene.layout.VBox;
+
 
 
 /**
@@ -44,6 +46,7 @@ public class CalendarController {
     @FXML private ColorPicker eventColorPicker;
     @FXML private ListView<Event> eventListView;
     @FXML private Label eventListDateLabel;
+    @FXML private Button collaborationToggleButton;
     
     // 輔助類實例
     private EventManager eventManager;
@@ -86,8 +89,72 @@ public class CalendarController {
         
         // 初始顯示日曆
         updateCalendar();
+        initializeCollaborationButton();
+    }
+
+    private void initializeCollaborationButton() {
+        if (collaborationToggleButton != null) {
+            updateCollaborationButtonText();
+            collaborationToggleButton.setOnAction(e -> handleCollaborationToggle());
+        }
+    }
+        @FXML
+    private void handleCollaborationToggle() {
+        // 防止快速多次點擊
+        if (collaborationToggleButton.isDisabled()) {
+            return;
+        }
+        
+        collaborationToggleButton.setDisable(true);
+        
+        if (eventManager.isCollaborationMode()) {
+            eventManager.enablePersonalMode();
+            showModeChangeMessage("已切換到個人模式", false);
+        } else {
+            eventManager.enableCollaborationMode();
+            showModeChangeMessage("已切換到協作模式 - 所有用戶的協作事件將會共享顯示", true);
+        }
+        
+        updateCollaborationButtonText();
+        updateCalendar(); // 確保更新日曆和事件列表
+        
+        System.out.println("Switched to: " + eventManager.getCurrentModeText());
+        
+        // 使用 Platform.runLater 確保 UI 更新完成後再啟用按鈕
+        Platform.runLater(() -> {
+            collaborationToggleButton.setDisable(false);
+        });
     }
     
+    private void showModeChangeMessage(String message, boolean isCollaboration) {
+        // 使用 JavaFX Alert 顯示提示訊息
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+            javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle("模式切換");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        
+        // 設置不同的樣式，根據協作模式或個人模式
+        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        String style = isCollaboration 
+            ? "-fx-background-color: #FFF3E0; -fx-border-color: #FF9800;" 
+            : "-fx-background-color: #E8F5E9; -fx-border-color: #4CAF50;";
+        dialogPane.setStyle(style);
+        
+        alert.showAndWait();
+    }
+
+    private void updateCollaborationButtonText() {
+        if (collaborationToggleButton != null) {
+            if (eventManager.isCollaborationMode()) {
+                collaborationToggleButton.setText("📝 個人模式");
+                collaborationToggleButton.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white;");
+            } else {
+                collaborationToggleButton.setText("👥 協作模式");
+                collaborationToggleButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+            }
+        }
+    }
     /**
      * 初始化事件編輯面板
      */
@@ -174,54 +241,50 @@ public class CalendarController {
      * 更新日曆顯示
      */
     private void updateCalendar() {
-        // 清除先前的日曆內容
-        calendarGrid.getChildren().clear();
-        
-        // 更新月份年份標題
-        dateNavigator.updateMonthYearLabel(monthYearLabel);
-        
-        // 添加星期標題 (0行)
-        for (int i = 0; i < 7; i++) {
-            DayOfWeek day = DayOfWeek.of((i + 1) % 7 + 1); // 從星期日開始
-            Label dayLabel = uiFactory.createDayHeaderLabel(day);
-            calendarGrid.add(dayLabel, i, 0);
+        // 更新月年標籤
+        if (monthYearLabel != null) {
+            dateNavigator.updateMonthYearLabel(monthYearLabel);
         }
         
-        // 獲取當月信息
-        int daysInMonth = dateNavigator.getDaysInMonth();
-        int dayOfWeekValue = dateNavigator.getFirstDayOfMonthWeekday();
-        
-        // 填充日曆
-        int day = 1;
-        int row = 1; // 從第1行開始（第0行是星期標題）
-        
-        // 填充第一週前的空白
-        for (int col = 0; col < dayOfWeekValue; col++) {
-            calendarGrid.add(uiFactory.createCell(""), col, row);
-        }
-        
-        // 填充日期
-        for (int col = dayOfWeekValue; col < 7; col++) {
-            if (day <= daysInMonth) {
-                calendarGrid.add(
-                    uiFactory.createDateCell(day, dateNavigator.getCurrentDate()), 
-                    col, row
-                );
-                day++;
+        // 重新繪製日曆網格
+        if (calendarGrid != null) {
+            calendarGrid.getChildren().clear();
+            
+            // 添加星期標題
+            String[] dayHeaders = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+            for (int i = 0; i < dayHeaders.length; i++) {
+                Label dayLabel = new Label(dayHeaders[i]);
+                dayLabel.getStyleClass().add("day-header");
+                dayLabel.setMaxWidth(Double.MAX_VALUE);
+                dayLabel.setAlignment(javafx.geometry.Pos.CENTER);
+                calendarGrid.add(dayLabel, i, 0);
+            }
+            
+            // 獲取當月信息
+            LocalDate currentDate = dateNavigator.getCurrentDate();
+            int firstDayOfWeek = dateNavigator.getFirstDayOfMonthWeekday();
+            int daysInMonth = dateNavigator.getDaysInMonth();
+            
+            // 添加日期格子
+            int currentDay = 1;
+            for (int week = 1; week <= 6 && currentDay <= daysInMonth; week++) {
+                for (int dayOfWeek = 0; dayOfWeek < 7 && currentDay <= daysInMonth; dayOfWeek++) {
+                    if (week == 1 && dayOfWeek < firstDayOfWeek) {
+                        // 空格子（月初前的空白）
+                        VBox emptyCell = uiFactory.createCell("");
+                        calendarGrid.add(emptyCell, dayOfWeek, week);
+                    } else {
+                        // 日期格子
+                        VBox dateCell = uiFactory.createDateCell(currentDay, currentDate);
+                        calendarGrid.add(dateCell, dayOfWeek, week);
+                        currentDay++;
+                    }
+                }
             }
         }
         
-        // 填充剩下的週
-        while (day <= daysInMonth) {
-            row++;
-            for (int col = 0; col < 7 && day <= daysInMonth; col++) {
-                calendarGrid.add(
-                    uiFactory.createDateCell(day, dateNavigator.getCurrentDate()), 
-                    col, row
-                );
-                day++;
-            }
-        }
+        // 確保事件列表也更新
+        updateEventList();
     }
     
     /**
@@ -330,15 +393,30 @@ public class CalendarController {
             }
         }
         
-        if (selectedEvent == null) {
-            // 創建新事件
+        if (selectedEvent == null) {            // 創建新事件
             Event newEvent;
             if (isContinuous) {
                 newEvent = new Event(eventDate, endDate, time, eventName, selectedColor);
             } else {
                 newEvent = new Event(eventDate, time, eventName, selectedColor);
-            }
+            }            
             eventManager.addEvent(newEvent);
+            
+            // 顯示添加成功訊息，根據當前模式顯示不同提示
+            if (eventManager.isCollaborationMode()) {
+                // 使用 JavaFX Alert 顯示協作事件添加成功的提示
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.INFORMATION);
+                alert.setTitle("協作事件");
+                alert.setHeaderText(null);
+                alert.setContentText("協作事件已添加！\n所有用戶都能看到此事件。");
+                
+                // 設置樣式
+                javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.setStyle("-fx-background-color: #FFF3E0; -fx-border-color: #FF9800;");
+                
+                alert.showAndWait();
+            }
         } else {
             // 更新現有事件
             selectedEvent.setDate(eventDate);
@@ -482,6 +560,27 @@ public class CalendarController {
         dateNavigator.setCurrentDate(LocalDate.of(year, month, 1));
         // 更新日曆顯示
         updateCalendar();
+    }
+
+    /**
+     * 顯示事件操作訊息
+     */
+    private void showEventActionMessage(String message, boolean isCollaboration) {
+        // 使用 JavaFX Alert 顯示提示訊息
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+            javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle("事件操作");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        
+        // 設置不同的樣式，根據協作模式或個人模式
+        javafx.scene.control.DialogPane dialogPane = alert.getDialogPane();
+        String style = isCollaboration 
+            ? "-fx-background-color: #FFF3E0; -fx-border-color: #FF9800;" 
+            : "-fx-background-color: #E8F5E9; -fx-border-color: #4CAF50;";
+        dialogPane.setStyle(style);
+        
+        alert.showAndWait();
     }
 
 }

@@ -14,6 +14,7 @@ import main.models.UserModel;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 public class DiaryDatabase {
     // ORMLite
@@ -187,6 +188,117 @@ public class DiaryDatabase {
         }
     }
     //新增
+    // 新增：個人事件查詢方法
+    public List<EventModel> getPersonalEventsForUser(String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) return List.of();
+            
+            return eventDao.queryBuilder()
+                .where()
+                .eq("user_id", user.getId())
+                .and()
+                .eq("isCollaborationEvent", false) // 只獲取個人事件
+                .query();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get personal events for user", e);
+        }
+    }
+
+    public List<EventModel> getPersonalEventsForDate(LocalDate date, String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) return List.of();
+            
+            String dateStr = date.toString();
+            return eventDao.queryBuilder()
+                .where()
+                .eq("user_id", user.getId())
+                .and()
+                .eq("isCollaborationEvent", false) // 只獲取個人事件
+                .and()
+                .le("date", dateStr)
+                .and()
+                .ge("endDate", dateStr)
+                .query();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get personal events for date", e);
+        }
+    }    public List<EventModel> getAllCollaborationEvents() {
+        try {
+            // 不再過濾用戶ID，只返回所有標記為協作的事件
+            List<EventModel> collaborationEvents = eventDao.queryBuilder()
+                .where()
+                .eq("isCollaborationEvent", true) // 只獲取協作事件
+                .query();
+            
+            // 過濾掉可能有無效用戶資料的事件
+            List<EventModel> validEvents = new ArrayList<>();
+            for (EventModel event : collaborationEvents) {
+                // 確保所有必要字段都不為null
+                if (event.getDate() != null && event.getEndDate() != null && 
+                    event.getTime() != null && event.getDescription() != null) {
+                    validEvents.add(event);
+                } else {
+                    System.err.println("忽略無效的協作事件：必要欄位為null");
+                }
+            }
+            
+            return validEvents;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get collaboration events", e);
+        }
+    }
+
+    public List<EventModel> getCollaborationEventsForDate(LocalDate date) {
+        try {
+            String dateStr = date.toString();
+            // 不再過濾用戶ID，只返回所有符合日期的協作事件
+            return eventDao.queryBuilder()
+                .where()
+                .eq("isCollaborationEvent", true) // 只獲取協作事件
+                .and()
+                .le("date", dateStr)
+                .and()
+                .ge("endDate", dateStr)
+                .query();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get collaboration events for date", e);
+        }
+    }
+
+    // 新增：分離的保存方法
+    public void savePersonalEvent(EventModel event, String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) throw new RuntimeException("User not found");
+            
+            event.setUser(user);
+            event.setCollaborationEvent(false); // 標記為個人事件
+            eventDao.create(event);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save personal event", e);
+        }
+    }    public void saveCollaborationEvent(EventModel event, String userEmail) {
+        try {
+            UserModel user = getUserEntry(userEmail);
+            if (user == null) throw new RuntimeException("User not found");
+            
+            // 只記錄創建者，但事件是共享的
+            event.setUser(user);
+            event.setCollaborationEvent(true); // 標記為協作事件
+            
+            // 添加創建者信息到描述中，這樣所有用戶都能看到誰創建了事件
+            String originalDesc = event.getDescription();
+            event.setDescription("[由 " + user.getEmail() + " 創建] " + originalDesc);
+            
+            eventDao.create(event);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save collaboration event", e);
+        }
+    }
+
+    
 
 
     public UserModel getUserEntry(String email) {

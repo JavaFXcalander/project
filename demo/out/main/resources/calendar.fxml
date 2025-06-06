@@ -94,7 +94,7 @@
                 <padding>
                     <Insets top="10" right="10" bottom="10" left="10" />
                 </padding>
-                <Button text="Month" styleClass="Month-button"/>
+                <Button  styleClass="Month-button" text="👥 協作模式" fx:id="collaborationToggleButton" onAction="#handleCollaborationToggle"/>
                 <Button text="Project" styleClass="Project-button" onAction="#handleProjectButton"/>
             </HBox>
             <HBox spacing="5" alignment="CENTER">

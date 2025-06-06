@@ -32,6 +32,9 @@ public class EventModel {
     
     @DatabaseField
     private boolean isContinuous;
+
+    @DatabaseField
+    private boolean isCollaborationEvent = false;
     
     // ORMLite 需要無參構造器
     public EventModel() {
@@ -49,6 +52,28 @@ public class EventModel {
         this.colorHex = toHex(event.getColor());
         this.isContinuous = event.isContinuous();
     }
+
+    public EventModel(main.Event event, UserModel user, boolean isCollaborationEvent) {
+        this.user = user;
+        this.date = event.getDate().toString();
+        this.endDate = event.getEndDate().toString();
+        this.time = String.format("%02d:%02d", 
+                    event.getTime().getHour(), 
+                    event.getTime().getMinute());
+        this.description = event.getDescription();
+        this.colorHex = toHex(event.getColor());
+        this.isContinuous = event.isContinuous();
+        this.isCollaborationEvent = isCollaborationEvent; // 新增這行
+    }
+
+    // 添加 getter/setter：
+    public boolean isCollaborationEvent() {
+        return isCollaborationEvent;
+    }
+
+    public void setCollaborationEvent(boolean collaborationEvent) {
+        isCollaborationEvent = collaborationEvent;
+    }
     
     // 轉換為 Event 對象
     public main.Event toEvent() {
@@ -56,12 +81,21 @@ public class EventModel {
         LocalDate eventEndDate = LocalDate.parse(this.endDate);
         LocalTime eventTime = LocalTime.parse(this.time);
         Color eventColor = fromHex(this.colorHex);
+          String description = this.description;
+        // 只在協作事件中顯示創建者
+        if (this.isCollaborationEvent && this.user != null) {
+            String userEmail = this.user.getEmail();
+            // 添加 null 檢查，確保 userEmail 不為 null
+            if (userEmail != null) {
+                String userName = userEmail.split("@")[0];
+                description = "[" + userName + "] " + this.description;
+            }
+        }
         
         if (this.isContinuous) {
-            return new main.Event(eventDate, eventEndDate, eventTime, 
-                                  this.description, eventColor);
+            return new main.Event(eventDate, eventEndDate, eventTime, description, eventColor);
         } else {
-            return new main.Event(eventDate, eventTime, this.description, eventColor);
+            return new main.Event(eventDate, eventTime, description, eventColor);
         }
     }
     

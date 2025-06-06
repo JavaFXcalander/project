@@ -21,10 +21,29 @@ public class EventManager {
     private LocalDate selectedDate;
     private String currentUserEmail; // 當前用戶郵箱
     private DiaryDatabase database;
-    
-    public EventManager() {
+    private boolean isCollaborationMode = false; // 新增
+      public EventManager() {
         this.selectedDate = LocalDate.now();
         this.database = DiaryDatabase.getInstance();
+    }
+
+    public void enableCollaborationMode() {
+        this.isCollaborationMode = true;
+        loadAllEventsFromDatabase();
+        System.out.println("已切換到協作模式：所有用戶的協作事件將會共享顯示");
+    }
+
+    public void enablePersonalMode() {
+        this.isCollaborationMode = false;
+        loadAllEventsFromDatabase();
+    }
+
+    public boolean isCollaborationMode() {
+        return isCollaborationMode;
+    }
+
+    public String getCurrentModeText() {
+        return isCollaborationMode ? "協作模式" : "個人模式";
     }
     
     /**
@@ -37,16 +56,26 @@ public class EventManager {
     
     /**
      * 從資料庫載入所有事件
-     */
-    private void loadAllEventsFromDatabase() {
-        if (currentUserEmail == null) return;
+     */    private void loadAllEventsFromDatabase() {
+        eventMap.clear(); // 確保清空現有的事件映射
+        List<EventModel> eventModels;
         
-        eventMap.clear();
-        List<EventModel> eventModels = database.getAllEventsForUser(currentUserEmail);
+        if (isCollaborationMode) {
+            eventModels = database.getAllCollaborationEvents();
+        } else {
+            if (currentUserEmail == null) return;
+            eventModels = database.getPersonalEventsForUser(currentUserEmail);
+        }
         
         for (EventModel eventModel : eventModels) {
-            Event event = eventModel.toEvent();
-            addEventToMap(event);
+            try {
+                Event event = eventModel.toEvent();
+                addEventToMap(event);
+            } catch (Exception e) {
+                // 處理可能發生的轉換錯誤，例如 NullPointerException
+                System.err.println("Error converting event model to event: " + e.getMessage());
+                // 繼續處理下一個事件
+            }
         }
         
         updateCurrentDateEvents();
@@ -127,8 +156,7 @@ public class EventManager {
             currentDateEvents.addAll(eventMap.get(selectedDate));
         }
     }
-    
-    /**
+      /**
      * 添加新事件
      */
     public void addEvent(Event event) {
@@ -136,15 +164,24 @@ public class EventManager {
             throw new RuntimeException("No user logged in");
         }
         
-        // 儲存到資料庫
+        // 使用新構造器，明確指定是否為協作事件
         EventModel eventModel = new EventModel(event, 
-                                 database.getUserEntry(currentUserEmail));
-        database.saveEvent(eventModel, currentUserEmail);
+                                database.getUserEntry(currentUserEmail), 
+                                isCollaborationMode);
         
-        // 添加到記憶體Map
+        if (isCollaborationMode) {
+            // 如果是協作模式，使用 saveCollaborationEvent 方法保存
+            // 這個方法會將事件標記為協作事件，並記錄創建者信息
+            database.saveCollaborationEvent(eventModel, currentUserEmail);
+            System.out.println("已在協作模式下添加事件，所有用戶可見。");
+        } else {
+            // 如果是個人模式，使用 savePersonalEvent 方法保存
+            // 這個方法會將事件標記為個人事件，只有創建者可見
+            database.savePersonalEvent(eventModel, currentUserEmail);
+        }
+        
         addEventToMap(event);
         
-        // 如果事件在選中日期範圍內，更新事件列表
         if (event.isOnDate(selectedDate)) {
             currentDateEvents.add(event);
         }
@@ -155,14 +192,18 @@ public class EventManager {
      */
     public void removeEvent(Event event) {
         if (currentUserEmail == null) return;
-        
-        // 先從記憶體移除
+    
         removeEventFromMap(event);
         currentDateEvents.remove(event);
         
-        // 從資料庫刪除 - 需要找到對應的 EventModel
-        List<EventModel> userEvents = database.getAllEventsForUser(currentUserEmail);
-        for (EventModel eventModel : userEvents) {
+        List<EventModel> eventModels;
+        if (isCollaborationMode) {
+            eventModels = database.getAllCollaborationEvents();
+        } else {
+            eventModels = database.getPersonalEventsForUser(currentUserEmail);
+        }
+        
+        for (EventModel eventModel : eventModels) {
             Event dbEvent = eventModel.toEvent();
             if (eventsEqual(event, dbEvent)) {
                 database.deleteEvent(eventModel);
@@ -177,28 +218,34 @@ public class EventManager {
     public void updateEvent(Event event) {
         if (currentUserEmail == null) return;
         
-        // 找到資料庫中對應的事件並更新
-        List<EventModel> userEvents = database.getAllEventsForUser(currentUserEmail);
-        for (EventModel eventModel : userEvents) {
+        List<EventModel> eventModels;
+        if (isCollaborationMode) {
+            eventModels = database.getAllCollaborationEvents();
+        } else {
+            eventModels = database.getPersonalEventsForUser(currentUserEmail);
+        }
+        
+        for (EventModel eventModel : eventModels) {
             Event dbEvent = eventModel.toEvent();
             if (eventsEqual(event, dbEvent)) {
-                // 更新 EventModel
-                eventModel.setDate(event.getDate().toString());
-                eventModel.setEndDate(event.getEndDate().toString());
-                eventModel.setTime(String.format("%02d:%02d", 
-                                   event.getTime().getHour(), 
-                                   event.getTime().getMinute()));
-                eventModel.setDescription(event.getDescription());
-                eventModel.setColorHex(toHex(event.getColor()));
-                eventModel.setContinuous(event.isContinuous());
-                
+                updateEventModelFromEvent(eventModel, event);
                 database.updateEvent(eventModel);
                 break;
             }
         }
         
-        // 重新載入所有事件以確保一致性
         loadAllEventsFromDatabase();
+    }
+
+    private void updateEventModelFromEvent(EventModel eventModel, Event event) {
+        eventModel.setDate(event.getDate().toString());
+        eventModel.setEndDate(event.getEndDate().toString());
+        eventModel.setTime(String.format("%02d:%02d", 
+                        event.getTime().getHour(), 
+                        event.getTime().getMinute()));
+        eventModel.setDescription(event.getDescription());
+        eventModel.setColorHex(toHex(event.getColor()));
+        eventModel.setContinuous(event.isContinuous());
     }
     
     /**
